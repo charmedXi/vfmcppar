@@ -1,11 +1,8 @@
-vfmcpp
+vfmcppar
 ==============
-vfmcpp is a C++ implementation of the vortex filament model of superfluids, used to study the dynamics of ring/ring and ring/line scattering.
+vfmcppar is a parallel C++ implementation of [vfmcpp](http://www.github.com/charmedxi/vfmcpp), a simulation code used to study the dynamics of ring/ring and ring/line scattering under the vortex filament model.
 
-To compile in Linux, you can use the makefile `make`; it is advised you use GCC 4.7+, as that is all that has been tested. 
-Help with initial conditions can be found by running `run.sh` with the flag `-h`. 
-
-Visualisation is currently performed by a 3D matplotlib script (requires latest matplotlib version), which leaves a lot to be desired. 
+More to come...
 
 run.sh
 ---------
