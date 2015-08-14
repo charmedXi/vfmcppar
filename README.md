@@ -2,7 +2,11 @@ vfmcppar
 ==============
 vfmcppar is a parallel C++ implementation of [vfmcpp](http://www.github.com/charmedxi/vfmcpp), a simulation code used to study the dynamics of ring/ring and ring/line scattering under the vortex filament model.
 
-More to come...
+Visualisation is currently performed by a 3D matplotlib script (requires latest matplotlib version), which leaves a lot to be desired. Below are some dated animations (with old version of reconnection) to give an example visualisations only.
+
+ ![alt text](http://giant.gfycat.com/AmbitiousPlushBetafish.gif "4 ring reconnection")
+
+ ![alt text](http://giant.gfycat.com/ZigzagDelightfulBuzzard.gif "Highly distorted string colliding with ring")
 
 run.sh
 ---------
