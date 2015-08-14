@@ -49,7 +49,7 @@ public:
 	}
 	~Tangle(){};
 	string Initialise(string runfile);
-	void CalcVelocityNL();
+	void CalcVelocityNL(Point* pField);
 	bool LoopKill();
 	void Reconnection();
 	void SelfReconnect(int P, int Q, int k, int l);
