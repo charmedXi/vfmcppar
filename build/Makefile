@@ -7,7 +7,7 @@ vpath %.cpp ../src
 # optimization and language dialect flags
 
 CXXFLAGS = -std=c++11
-CXXFLAGS += -g -O3
+#CXXFLAGS += -g
 
 # guess compiler from --version output and add compiler-specific
 # options
@@ -15,10 +15,10 @@ CXXFLAGS += -g -O3
 compiler_key := $(shell $(CXX) --version | sed -e 's/ .*//' -e 1q)
 
 ifeq ($(compiler_key),icpc)
-CXXFLAGS += -xhost -openmp
+CXXFLAGS += -O3 -xHost -openmp
 LDFLAGS += -openmp
 else
-CXXFLAGS += -march=native -fopenmp
+CXXFLAGS += -Ofast -march=native -fopenmp -mfpmath=sse
 LDFLAGS += -fopenmp
 endif
 
