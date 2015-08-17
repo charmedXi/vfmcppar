@@ -19,7 +19,7 @@ CXXFLAGS += -xhost -openmp
 LDFLAGS += -openmp
 else
 CXXFLAGS += -march=native -fopenmp
-LDLIBS += -lomp
+LDFLAGS += -fopenmp
 endif
 
 
