@@ -1,9 +1,14 @@
 #ifndef GUARD_POINTS_H
 #define GUARD_POINTS_H
 
-#include <vector>
+#include <array>
 #include <cmath>
 #include <iostream>
+
+typedef std::array<double,3>  vec3d;
+inline void zero(vec3d &v) {
+    v[0]=0.0; v[1]=0.0; v[2]=0.0;
+}
 
 using namespace std;
 
@@ -12,15 +17,15 @@ public:
 	/* member data */
 	Point 			*mPrev;				// pointer to previous point in filament
 	Point 			*mNext;				// pointer to next point in filament
-	vector <double>	mPos;				// position
-	vector <double>	mVel; 				// current velocity
-	vector <double> mVel1;				// velocity last time step
-	vector <double> mVel2;  			// velocity 2 time steps ago
-	vector <double> mVel3;  			// velocity 3 time steps ago
-	vector <double>	mVelNL; 			// non-local contributions to velocity
-	vector <double> mSPrime;			// tangent at point
-	vector <double> mS2Prime;			// binormal at point
-	vector <double> mSegLast; 			// vector to last point
+	vec3d	mPos;				// position
+	vec3d	mVel; 				// current velocity
+	vec3d mVel1;				// velocity last time step
+	vec3d mVel2;  			// velocity 2 time steps ago
+	vec3d mVel3;  			// velocity 3 time steps ago
+	vec3d	mVelNL; 			// non-local contributions to velocity
+	vec3d mSPrime;			// tangent at point
+	vec3d mS2Prime;			// binormal at point
+	vec3d mSegLast; 			// vector to last point
 	double			mSegLength; 		// distance to last point
 	double 			mCharge; 			// charge at point
 	int 			mFlagFilled;		// flag showing how many velocity steps back are present
@@ -31,29 +36,28 @@ public:
 	/* member functions */
 	Point(){
 		/* default constructor just reserves memory */
-		mVel.resize(3); mPos.resize(3);
-		mVel1.resize(3); mVel2.resize(3); mVel3.resize(3); mVelNL.resize(3);
-		mSPrime.resize(3); mS2Prime.resize(3); mSegLast.resize(3);
 		mCharge = 0; mSegLength = 0; mFlagFilled = 0; mMarkedForDeletion = false; mMarkedForRecon = false;
 		mFlagDummy = false;
 	}
-	Point(Point* occ){
+	explicit Point(Point* occ){
 		/* parameterised constructor copies a point, used in reconnection */
-		mVel = occ->mVel; mVel1 = occ->mVel1; mVel2 = occ->mVel2; mVel3 = occ->mVel3; mVelNL.resize(3);
-		mPos = occ->mPos; mSPrime.resize(3); mS2Prime.resize(3); mSegLast.resize(3);
+		mVel = occ->mVel; mVel1 = occ->mVel1; mVel2 = occ->mVel2; mVel3 = occ->mVel3;
+		zero(mVelNL);
+		mPos = occ->mPos;
+		zero(mSPrime); zero(mS2Prime); zero(mSegLast);
 		mCharge = 0; mSegLength = 0; mFlagFilled = occ->mFlagFilled; mMarkedForDeletion = false; mMarkedForRecon = occ->mMarkedForRecon;
 		mFlagDummy = false;
 	}
-	Point(vector <double> CurrentPos){
+	Point(const vec3d &CurrentPos) {
 		/* parameterised constructor copies a point, used in reconnection */
-		mPos.resize(3);
-		mPos[0] = CurrentPos[0]; mPos[1] = CurrentPos[1]; mPos[2] = CurrentPos[2];
-		mVel.resize(3); mVel1.resize(3); mVel2.resize(3); mVel3.resize(3); mVelNL.resize(3);
-		mSPrime.resize(3); mS2Prime.resize(3); mSegLast.resize(3);
+		mPos=CurrentPos;
+		zero(mVel); zero(mVel1); zero(mVel2); zero(mVel3); zero(mVelNL);
+		zero(mSPrime); zero(mS2Prime); zero(mSegLast);
 		mCharge = 0; mSegLength = 0; mFlagFilled = 0; mMarkedForDeletion = false; mMarkedForRecon = false;
 		mFlagDummy = false;
 	}
 	~Point(){};
+
 	double Disp2(Point* p2){
 		double disp2(0);
 		for(int i(0); i!=3; i++){

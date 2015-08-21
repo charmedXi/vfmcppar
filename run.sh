@@ -163,9 +163,9 @@ if [ ! -f "$in" ]; then
 fi
 
 
-	dir=$(grep -v '^#' $in | grep 'path')
-	dir=${dir:5}
-	echo $dir
+dir=$(grep -v '^#' $in | grep 'path')
+dir=${dir:5}
+echo $dir
 	
 if [ -d "$dir" ]; then
 	echo "data directory found, cleaning up...\n\n"
@@ -179,13 +179,15 @@ fi
 
 if [ ! -d "$dir" ]; then
 	echo "data directory not found, creating...\n\n"
-	mkdir "$dir"
+	mkdir -p "$dir"
 	mkdir "$dir/snapshot"
 fi
 
 if [ $CPILE -eq 1 ]; then
 	echo " ${blu} -c flag specified, recompiling source...${red}"
-	make
+	[ -d bin ] || mkdir bin
+        [ -e bin/vfmcpp ] || ln -s build/vfmcpp bin/vfmcpp
+	(cd build && make)
 	echo " ${blu} success!\n\n"
 fi
 
