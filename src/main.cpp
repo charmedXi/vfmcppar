@@ -44,15 +44,27 @@ int main(int argc, char* argv[]){
 
 	while(i < N_t){
 		Tangle.mStep = i;
-
+		int delay_size = Tangle.mDelayedTimes.size();
+		if(Tangle.mDelayFlag == true){
+			for(int k(0); k<delay_size; k++){
+				if(i*Tangle.mDt > Tangle.mDelayedTimes[k]){
+					Tangle.mTangle.push_back(Tangle.mDelayed[k]);
+					Tangle.mDelayed.erase(Tangle.mDelayed.begin() + k);
+					Tangle.mDelayedTimes.erase(Tangle.mDelayedTimes.begin() + k);
+					Tangle.mLog << Tangle.StringTime() << "\t\t\t\t\tring added" << endl;
+					delay_size--;
+					break;
+				}
+			}
+			if(delay_size == 0){Tangle.mDelayFlag = false;}
+		}
 		/* save positions to file every mN_f steps */
-		
 		if(i%Tangle.mN_f==0){
 			Tangle.Output(filename, i, file_no);
 			t_temp = clock() -t;
 			printf("\t\t wrote step %6u", i);
 			Tangle.mLog << Tangle.StringTime() << "\t" << setw(10) << Tangle.mStep;
-			Tangle.mLog << "\telapsed: " << ((float)t_temp)/CLOCKS_PER_SEC << " s:\t\twrote to file " << file_no << " for time " << i*us_Dt << " us" << endl;
+			Tangle.mLog << "\telapsed: " << omp_get_wtime() << " s:\t\twrote to file " << file_no << " for time " << i*us_Dt << " us" << endl;
 			file_no++; 
 		}
 		if(i%100==0 || i%Tangle.mN_f==0){
@@ -80,7 +92,7 @@ int main(int argc, char* argv[]){
 		/* calculate velocities and propagate positions */
 		for(int P=0; P<Tangle.mTangle.size(); P++){
 			int mN=Tangle.mTangle[P]->mN;
-			#pragma omp parallel for
+			#pragma omp parallel for schedule(static)
 			for(int k=0; k<mN; k++){
 				Point* pField = Tangle.mTangle[P]->mPoints[k];
 				Tangle.CalcVelocityNL(pField);	// calculates non-local contributions to velocity
@@ -93,14 +105,13 @@ int main(int argc, char* argv[]){
 	}
 
 	cout << "\n\t - - - - - - -    SIMULATION FINISHED    - - - - - - - -" << endl;
-	cout << "Leaf has size = " << sizeof(Tangle) << endl;
 	Tangle.mLog << Tangle.StringTime() << "\t\t\t\tsimulation finished" << endl;
 	ofstream timefile(filename+"/time.dat");
 	t = clock()-t;
-	timefile << "time elapsed = " << ((float)t)/CLOCKS_PER_SEC << " s " << endl;
+	timefile << "time elapsed = " << omp_get_wtime() << " s " << endl;
 	timefile << "number of recons = " << Tangle.mN_recon << endl;
 	timefile << "number of loop kills = " << Tangle.mN_loopkills << endl;
-	Tangle.mLog	<< Tangle.StringTime() << "\t\t\t\ttime elapsed = " << ((float)t)/CLOCKS_PER_SEC << " s " << endl;
+	Tangle.mLog	<< Tangle.StringTime() << "\t\t\t\ttime elapsed = " << omp_get_wtime() << " s " << endl;
 	Tangle.mLog << Tangle.StringTime() << "\t\t\t\tnumber of recons = " << Tangle.mN_recon << endl;
 	Tangle.mLog << Tangle.StringTime() << "\t\t\t\tnumber of loop kills = " << Tangle.mN_loopkills << endl;
 	timefile.close(); 

@@ -15,23 +15,23 @@ using namespace std;
 class Point{
 public:
 	/* member data */
-	Point 			*mPrev;				// pointer to previous point in filament
-	Point 			*mNext;				// pointer to next point in filament
-	vec3d	mPos;				// position
-	vec3d	mVel; 				// current velocity
-	vec3d mVel1;				// velocity last time step
-	vec3d mVel2;  			// velocity 2 time steps ago
-	vec3d mVel3;  			// velocity 3 time steps ago
-	vec3d	mVelNL; 			// non-local contributions to velocity
-	vec3d mSPrime;			// tangent at point
-	vec3d mS2Prime;			// binormal at point
-	vec3d mSegLast; 			// vector to last point
-	double			mSegLength; 		// distance to last point
-	double 			mCharge; 			// charge at point
-	int 			mFlagFilled;		// flag showing how many velocity steps back are present
-	bool			mMarkedForRecon;	// flag used in reconnection
-	bool			mFlagDummy;			// flag indicating dummy points used for strings
-	bool			mMarkedForDeletion; // flag telling reconnect whether this point needs to be removed
+	Point 	*mPrev;				// pointer to previous point in filament
+	Point 	*mNext;				// pointer to next point in filament
+	vec3d 	mPos;				// position
+	vec3d 	mVel; 				// current velocity
+	vec3d 	mVel1;				// velocity last time step
+	vec3d 	mVel2;  			// velocity 2 time steps ago
+	vec3d 	mVel3;  			// velocity 3 time steps ago
+	vec3d 	mVelNL; 			// non-local contributions to velocity
+	vec3d 	mSPrime;			// tangent at point
+	vec3d 	mS2Prime;			// binormal at point
+	vec3d 	mSegLast; 			// vector to last point
+	double	mSegLength; 		// distance to last point
+	double 	mCharge; 			// charge at point
+	int 	mFlagFilled;		// flag showing how many velocity steps back are present
+	bool	mMarkedForRecon;	// flag used in reconnection
+	bool	mFlagDummy;			// flag indicating dummy points used for strings
+	bool	mMarkedForDeletion; // flag telling reconnect whether this point needs to be removed
 	
 	/* member functions */
 	Point(){
