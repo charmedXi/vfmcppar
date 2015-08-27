@@ -34,8 +34,7 @@ int main(int argc, char* argv[]){
 	/* prepare to time calculations */
 	double percent;
 	double us_Dt(Tangle.mDt * 1e6);
-	clock_t t, t_temp;
-	t=clock();
+	double t0 = omp_get_wtime();
 	int file_no(0);
 	/* begin time-stepping */
 	int i(0);
@@ -61,10 +60,9 @@ int main(int argc, char* argv[]){
 		/* save positions to file every mN_f steps */
 		if(i%Tangle.mN_f==0){
 			Tangle.Output(filename, i, file_no);
-			t_temp = clock() -t;
 			printf("\t\t wrote step %6u", i);
 			Tangle.mLog << Tangle.StringTime() << "\t" << setw(10) << Tangle.mStep;
-			Tangle.mLog << "\telapsed: " << omp_get_wtime() << " s:\t\twrote to file " << file_no << " for time " << i*us_Dt << " us" << endl;
+			Tangle.mLog << "\telapsed: " << omp_get_wtime()-t0 << " s:\t\twrote to file " << file_no << " for time " << i*us_Dt << " us" << endl;
 			file_no++; 
 		}
 		if(i%100==0 || i%Tangle.mN_f==0){
@@ -107,11 +105,10 @@ int main(int argc, char* argv[]){
 	cout << "\n\t - - - - - - -    SIMULATION FINISHED    - - - - - - - -" << endl;
 	Tangle.mLog << Tangle.StringTime() << "\t\t\t\tsimulation finished" << endl;
 	ofstream timefile(filename+"/time.dat");
-	t = clock()-t;
-	timefile << "time elapsed = " << omp_get_wtime() << " s " << endl;
+	timefile << "time elapsed = " << omp_get_wtime()-t0 << " s " << endl;
 	timefile << "number of recons = " << Tangle.mN_recon << endl;
 	timefile << "number of loop kills = " << Tangle.mN_loopkills << endl;
-	Tangle.mLog	<< Tangle.StringTime() << "\t\t\t\ttime elapsed = " << omp_get_wtime() << " s " << endl;
+	Tangle.mLog	<< Tangle.StringTime() << "\t\t\t\ttime elapsed = " << omp_get_wtime()-t0 << " s " << endl;
 	Tangle.mLog << Tangle.StringTime() << "\t\t\t\tnumber of recons = " << Tangle.mN_recon << endl;
 	Tangle.mLog << Tangle.StringTime() << "\t\t\t\tnumber of loop kills = " << Tangle.mN_loopkills << endl;
 	timefile.close(); 
