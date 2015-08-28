@@ -5,42 +5,71 @@
 #include "tangle.h"
 
 using namespace std;
-
+/* circulation quantum, core radius */
 const double	kappa = 9.98e-8, a0=1.3e-10, a1=exp(0.5)*a0;
 
 /* calculate velocity at each point from s' and s'' eq(2) from Hanninen and Baggaley PNAS 111 p4667 (2014) */
-void Tangle::CalcVelocity(){
-	/* circulation quantum, core radius */
-	vector <Filament*>::iterator b, c, e;
-	b = mTangle.begin(); e = mTangle.end();
-	for(c=b; c!=e; c++){
-		
-		for(int i(0);i<(*c)->mN;i++){
-			for(int j(0);j!=3;j++){
-				(*c)->mPoints[i]->mVel3[j] = (*c)->mPoints[i]->mVel2[j];
-				(*c)->mPoints[i]->mVel2[j] = (*c)->mPoints[i]->mVel1[j];
-				(*c)->mPoints[i]->mVel1[j] = (*c)->mPoints[i]->mVel[j];
-			}
-		}
-		(*c)->CalcMeshLengths(); 
-		(*c)->CalcSPrime(); 
-		(*c)->CalcS2Prime();
-		for(int i=0;i<(*c)->mN;i++){
-			if((*c)->mPoints[i]->mFlagFilled!=5){
-				if((*c)->mPoints[i]->mFlagFilled==3){(*c)->mPoints[i]->mFlagFilled++;}
-				if((*c)->mPoints[i]->mFlagFilled==2){(*c)->mPoints[i]->mFlagFilled++;}
-				if((*c)->mPoints[i]->mFlagFilled==1){(*c)->mPoints[i]->mFlagFilled++;}
-				if((*c)->mPoints[i]->mFlagFilled==0){(*c)->mPoints[i]->mFlagFilled++;}
-				(*c)->mPoints[i]->mVel[0] = (((*c)->mPoints[i]->mSPrime[1])*((*c)->mPoints[i]->mS2Prime[2]) - ((*c)->mPoints[i]->mSPrime[2])*((*c)->mPoints[i]->mS2Prime[1]));
-				(*c)->mPoints[i]->mVel[1] = (((*c)->mPoints[i]->mSPrime[2])*((*c)->mPoints[i]->mS2Prime[0]) - ((*c)->mPoints[i]->mSPrime[0])*((*c)->mPoints[i]->mS2Prime[2]));
-				(*c)->mPoints[i]->mVel[2] = (((*c)->mPoints[i]->mSPrime[0])*((*c)->mPoints[i]->mS2Prime[1]) - ((*c)->mPoints[i]->mSPrime[1])*((*c)->mPoints[i]->mS2Prime[0]));
-				/* apply prefactor and add non-local contributions, resetting mVelNL after */
-				for(int q=0;q<3;q++){
-					(*c)->mPoints[i]->mVel[q] *= kappa*log(2*sqrt((*c)->mPoints[i]->mSegLength * (*c)->mPoints[i]->mNext->mSegLength)/a1)/(4*PI);
-					(*c)->mPoints[i]->mVel[q] += (*c)->mPoints[i]->mVelNL[q];   
-					(*c)->mPoints[i]->mVelNL[q] = 0;		
-				}
-			}
+void Tangle::CalcVelocity(Point* pField){
+	// set velocity at previous time steps
+	for(int j(0);j!=3;j++){
+		pField->mVel3[j] = pField->mVel2[j];
+		pField->mVel2[j] = pField->mVel1[j];
+		pField->mVel1[j] = pField->mVel[j];
+	}
+	// calculate SPrime for just the point in question
+	double A, B, C, D, E;
+	double l, l1, l2, lm1;
+	l = pField->mSegLength; l1 = pField->mNext->mSegLength;
+	l2 = pField->mNext->mNext->mSegLength; lm1 = pField->mPrev->mSegLength;
+	A = l * l1 * l1 + l * l1 * l2;
+	A /= (lm1 * (lm1 + l) * (lm1 + l + l1) * (lm1 + l + l1 +l2));
+	B = -lm1 * l1 * l1 - l * l1 * l1 - lm1 * l1 * l2 - l * l1 * l2;
+	B /= (lm1 * l * (l + l1) * (l + l1 + l2));
+	D = lm1 * l * l1 + l * l * l1 + lm1 * l * l2 + l * l * l2;
+	D /= (l1 * l2 * (l + l1) * (lm1 + l + l1));
+	E = -l1 * l * l - lm1 * l * l1;
+	E /= (l2 * (l1 + l2) * (l + l1 + l2) * (lm1 + l + l1 + l2));
+	C = -(A + B + D + E);
+
+	for(int q=0;q<3;q++){
+		pField->mSPrime[q]  = A*pField->mPrev->mPrev->mPos[q];
+		pField->mSPrime[q] += B*pField->mPrev->mPos[q];
+		pField->mSPrime[q] += C*pField->mPos[q];
+		pField->mSPrime[q] += D*pField->mNext->mPos[q];
+		pField->mSPrime[q] += E*pField->mNext->mNext->mPos[q];
+	}
+	// calculate S2Prime for just the point in question
+	A = 2 * (-2 * l * l1  +  l1 * l1  - l * l2  +  l1 * l2 );
+	A = A / (lm1 * (lm1 +l)*(lm1 + l + l1)*(lm1 + l + l1 + l2));
+	B = 2 * (2 * lm1 * l1  + 2 * l * l1  -  l1 * l1  +  lm1 * l2  + l * l2  -  l1 * l2);
+	B = B / (lm1 * l *(l + l1) * (l + l1 + l2));
+	D = 2*(-lm1 * l - l * l +  lm1 * l1  + 2 * l * l1  +  lm1 * l2  + 2 * l * l2);
+	D = D / (l1 * l2 *(l + l1) * (lm1 + l + l1));
+	E = 2*(lm1 * l + l * l -  lm1 * l1  - 2 * l * l1 );
+	E = E / ( l2  * (l1 + l2) * (l+ l1 + l2) * (lm1 + l + l1 + l2));
+	C = -(A + B + D + E);
+
+	for(int q=0;q<3;q++){
+		pField->mS2Prime[q]  = A*pField->mPrev->mPrev->mPos[q];
+		pField->mS2Prime[q] += B*pField->mPrev->mPos[q];
+		pField->mS2Prime[q] += C*pField->mPos[q];
+		pField->mS2Prime[q] += D*pField->mNext->mPos[q];
+		pField->mS2Prime[q] += E*pField->mNext->mNext->mPos[q];
+	}
+
+	if(pField->mFlagFilled!=5){
+		if(pField->mFlagFilled==3){pField->mFlagFilled++;}
+		if(pField->mFlagFilled==2){pField->mFlagFilled++;}
+		if(pField->mFlagFilled==1){pField->mFlagFilled++;}
+		if(pField->mFlagFilled==0){pField->mFlagFilled++;}
+		pField->mVel[0] = ((pField->mSPrime[1])*(pField->mS2Prime[2]) - (pField->mSPrime[2])*(pField->mS2Prime[1]));
+		pField->mVel[1] = ((pField->mSPrime[2])*(pField->mS2Prime[0]) - (pField->mSPrime[0])*(pField->mS2Prime[2]));
+		pField->mVel[2] = ((pField->mSPrime[0])*(pField->mS2Prime[1]) - (pField->mSPrime[1])*(pField->mS2Prime[0]));
+		/* apply prefactor and add non-local contributions, resetting mVelNL after */
+		for(int q=0;q<3;q++){
+			pField->mVel[q] *= kappa*log(2*sqrt(pField->mSegLength * pField->mNext->mSegLength)/a1)/(4*PI);
+			pField->mVel[q] += pField->mVelNL[q];   
+			pField->mVelNL[q] = 0;		
 		}
 	}
 }

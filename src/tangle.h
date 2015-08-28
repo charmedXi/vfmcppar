@@ -50,15 +50,16 @@ public:
 	~Tangle(){};
 	string Initialise(string runfile);
 	void CalcVelocityNL(Point* pField);
+	void CalcVelocity(Point* pField);
+	void PropagatePos(Point* pField); 
 	bool LoopKill();
 	void Reconnection();
 	void SelfReconnect(int P, int Q, int k, int l);
 	void SelfReconnectLine(int P, int Q, int k, int l);
 	void Reconnect(int P, int Q, int k, int l);
-	void PropagatePos(double & dt); 
 	bool MeshAdjust();
 	int ReconnectionTest();
-	void CalcVelocity();
+	
 	void CalcField();
 	void Output(string filename, int i, int file_no);
 	const string StringTime() {

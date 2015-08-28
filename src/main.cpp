@@ -27,7 +27,7 @@ int main(int argc, char* argv[]){
 	/* set number of timesteps and number of steps per save */
 	int N_t(Tangle.mTotalTime/Tangle.mDt); // number of time steps
 	Tangle.mN_f = 10000; // number of time steps per save
-	Tangle.mN_slow = 0; // counts how many steps have occurred at slow-mo
+	Tangle.mN_slow = 0;  // counts how many steps have occurred at slow-mo
 
 	vector <Filament*>::iterator begin, current, end;
 
@@ -94,11 +94,10 @@ int main(int argc, char* argv[]){
 			for(int k=0; k<mN; k++){
 				Point* pField = Tangle.mTangle[P]->mPoints[k];
 				Tangle.CalcVelocityNL(pField);	// calculates non-local contributions to velocity
+				Tangle.CalcVelocity(pField); 	// calculates local contributions to velocity
+				Tangle.PropagatePos(pField);	// propagate positions
 			}
 		}
-
-		Tangle.CalcVelocity(); 		// calculates local contributions to velocity
-		Tangle.PropagatePos(Tangle.mDt);	// propagate positions
 		i++;	// step forward
 	}
 

@@ -10,6 +10,7 @@ bool Tangle::MeshAdjust(){
     vector <Filament*>::iterator b, c, e;
     b = mTangle.begin(); e = mTangle.end();
     for(c=b;c!=e;c++){
+        (*c)->CalcMeshLengths();
         for (int k((*c)->mFlagType); k<(*c)->mN; k++){
             /* define to check local curvature */
             double R(0); // 1/|s''| at point k
