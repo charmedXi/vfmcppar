@@ -87,16 +87,25 @@ int main(int argc, char* argv[]){
 		bool LoopKilled = Tangle.LoopKill(); 
 		if(LoopKilled == true) Tangle.mN_loopkills++;
 
-		/* calculate velocities and propagate positions */
+		int NumPoints = 0;
+		vector <int> sizes;
 		for(int P=0; P<Tangle.mTangle.size(); P++){
-			int mN=Tangle.mTangle[P]->mN;
-			#pragma omp parallel for schedule(static)
-			for(int k=0; k<mN; k++){
-				Point* pField = Tangle.mTangle[P]->mPoints[k];
-				Tangle.CalcVelocityNL(pField);	// calculates non-local contributions to velocity
-				Tangle.CalcVelocity(pField); 	// calculates local contributions to velocity
-				Tangle.PropagatePos(pField);	// propagate positions
+			sizes.push_back(NumPoints);
+			NumPoints += Tangle.mTangle[P]->mN;
+		}
+		#pragma omp parallel for schedule(static)
+		for(int q=0; q<NumPoints; q++){
+			int P, k;
+			for(int v=0; v<sizes.size(); v++){
+				if(q>=sizes[v]){
+					P = v;
+					k = q - sizes[v];
+				}
 			}
+			Point* pField = Tangle.mTangle[P]->mPoints[k];
+			Tangle.CalcVelocityNL(pField);	// calculates non-local contributions to velocity
+			Tangle.CalcVelocity(pField); 	// calculates local contributions to velocity
+			Tangle.PropagatePos(pField);	// propagate positions
 		}
 		i++;	// step forward
 	}
