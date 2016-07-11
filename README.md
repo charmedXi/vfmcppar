@@ -1,12 +1,13 @@
 vfmcppar
 ==============
-vfmcppar is a parallel C++ implementation of [vfmcpp](http://www.github.com/charmedxi/vfmcpp), a simulation code used to study the dynamics of ring/ring and ring/line scattering under the vortex filament model.
+vfmcppar is a parallel C++ implementation of [vfmcpp](http://www.github.com/ml-evs/vfmcpp), a simulation code used to study the dynamics of ring/ring and ring/line scattering under the vortex filament model.
 
-Visualisation is currently performed by a 3D matplotlib script (requires latest matplotlib version), which leaves a lot to be desired. Below are some dated animations (with old version of reconnection) to give an example visualisations only.
+To compile in Linux, you can use the makefile `make`; it is advised you use GCC 4.7+, as that is all that has been tested. 
+Help with initial conditions can be found by running `run.sh` with the flag `-h`. The serial version can be found  [here](https://github.com/ml-evs/vfmcpp). Before running the parallel version, ensure `$OMP_NUM_THREADS` is set to the desired value.
 
- ![alt text](http://giant.gfycat.com/AmbitiousPlushBetafish.gif "4 ring reconnection")
-
- ![alt text](http://giant.gfycat.com/ZigzagDelightfulBuzzard.gif "Highly distorted string colliding with ring")
+Visualisation is currently performed by a 3D matplotlib script (requires latest matplotlib version), which leaves a lot to be desired. Below are some dated animations (with old version of reconnection) to give an example visualisations only. This must be run with the data folder as an argument, e.g.
+	
+	python animate.py ~/vfmcpp/data/example_run
 
 run.sh
 ---------
