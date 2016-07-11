@@ -175,6 +175,12 @@ if [ -d "$dir" ]; then
 		mkdir "snapshot"
 	fi
 	cd $cwd
+else
+  mkdir "$dir"
+	if [ ! -d "snapshot" ]; then
+		mkdir "snapshot"
+	fi
+	cd $cwd
 fi
 
 if [ ! -d "$dir" ]; then
