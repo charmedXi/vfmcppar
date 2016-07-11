@@ -9,6 +9,9 @@ Visualisation is currently performed by a 3D matplotlib script (requires latest 
 	
 	python animate.py ~/vfmcpp/data/example_run
 
+![A ring-line collision](example.gif?raw=true "A ring-line collision")
+
+
 run.sh
 ---------
 
